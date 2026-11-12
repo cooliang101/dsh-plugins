@@ -1,9 +1,16 @@
 {
   "name": "@local/dsh-floating-assistant",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "private": true,
   "type": "module",
-  "exports": { ".": "./index.js" },
-  "files": ["index.js", "panels.js", "desktop.ps1", "panel.xaml", "cordis.patch.yml"],
+  "exports": {
+    ".": "./index.js",
+    "./locale/*.json": "./locale/*.json"
+  },
+  "scripts": {
+    "build": "node build-desktop.js",
+    "prepack": "npm run build"
+  },
+  "files": ["index.js", "panels.js", "bin/DshFloatingAssistant.exe", "cordis.patch.yml", "locale/*.json"],
   "dsh": { "bundle": { "patch": "./cordis.patch.yml" } }
 }

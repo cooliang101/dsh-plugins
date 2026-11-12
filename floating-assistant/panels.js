@@ -145,7 +145,13 @@ export function createPanels({ path, render, suspend }) {
       if (action.hideWindow) restore = await suspend(controller.signal);
       controller.signal.throwIfAborted();
       const result = await action.handler({ panelId: panel.id, actionId: id,
-        contextToken: state.contextToken, signal: controller.signal });
+        contextToken: state.contextToken, signal: controller.signal,
+        restoreWindow() {
+          if (!ownsSuspension) return;
+          releaseWindow();
+          timer.refresh();
+        },
+      });
       if (controller.signal.aborted) return;
       if (!['ok', 'error'].includes(result?.status)) throw new Error('无效的操作结果');
       const message = typeof result.message === 'string' ? result.message : '';

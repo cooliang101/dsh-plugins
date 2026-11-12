@@ -10,6 +10,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
 import { mkdtempSync, mkdirSync } from 'node:fs';
+import { registerTranslation } from './translation.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const CAPTURE_PS1 = join(HERE, 'capture.ps1');
@@ -43,10 +44,9 @@ function runCapture(args, timeoutMs, signal) {
 
 export const inject = ['tools'];
 
-async function captureRegion(timeoutMs, signal) {
+async function captureRegion(timeoutMs, signal, outPath) {
   signal.throwIfAborted();
-  const dir = mkdtempSync(join(tmpdir(), 'dsh-screenshot-'));
-  const outPath = join(dir, 'screenshot.png');
+  outPath ??= join(mkdtempSync(join(tmpdir(), 'dsh-screenshot-')), 'screenshot.png');
   const { stdout, stderr, error } = await runCapture(['-OutPath', outPath], timeoutMs, signal);
   signal.throwIfAborted();
   const lines = stdout.split(/\r?\n/).filter(line => line.trim().startsWith('{'));
@@ -60,7 +60,7 @@ async function captureRegion(timeoutMs, signal) {
   return result;
 }
 
-export function apply(ctx) {
+export function apply(ctx, config = {}) {
   /* ---- 全局热键守护（Ctrl+Alt+A 唤起截图，独立隐藏进程）---- */
   mkdirSync(HOTKEY_OUTPUT_DIR, { recursive: true });
   const watcher = spawn('powershell.exe', [
@@ -104,6 +104,8 @@ export function apply(ctx) {
       },
     },
   ));
+  const translation = ctx.inject(['floatingAssistant', 'llm', 'agentDefaultModel'], scope =>
+    registerTranslation(scope, (signal, path) => captureRegion(DEFAULT_TIMEOUT_MS, signal, path), config));
 
   /* ---- Agent 工具：screenshot ---- */
   const dispose = ctx.tools.register({
@@ -146,6 +148,7 @@ export function apply(ctx) {
     }),
   });
   return () => {
+    translation.dispose();
     floating.dispose();
     watcher.kill();
     dispose();

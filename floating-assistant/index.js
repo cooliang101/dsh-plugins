@@ -7,10 +7,8 @@ import { createPanels } from './panels.js';
 
 export function apply(ctx) {
   if (process.platform !== 'win32') return;
-  const child = spawn('powershell.exe', [
-    '-NoProfile', '-STA', '-ExecutionPolicy', 'Bypass', '-File',
-    fileURLToPath(new URL('./desktop.ps1', import.meta.url)),
-  ], { stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true });
+  const executable = fileURLToPath(new URL('./bin/DshFloatingAssistant.exe', import.meta.url));
+  const child = spawn(executable, [], { stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true });
   const lines = createInterface({ input: child.stdout });
   let stopped = false;
   let sequence = 0;
