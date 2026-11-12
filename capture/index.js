@@ -43,6 +43,23 @@ function runCapture(args, timeoutMs, signal) {
 
 export const inject = ['tools'];
 
+async function captureRegion(timeoutMs, signal) {
+  signal.throwIfAborted();
+  const dir = mkdtempSync(join(tmpdir(), 'dsh-screenshot-'));
+  const outPath = join(dir, 'screenshot.png');
+  const { stdout, stderr, error } = await runCapture(['-OutPath', outPath], timeoutMs, signal);
+  signal.throwIfAborted();
+  const lines = stdout.split(/\r?\n/).filter(line => line.trim().startsWith('{'));
+  let result;
+  try {
+    result = JSON.parse(lines[lines.length - 1]);
+  } catch {
+    throw new Error(`截图进程未返回结果（exit=${error?.code ?? '?'}）。stderr: ${stderr.slice(0, 400)}`);
+  }
+  if (!result.ok && result.reason !== 'cancelled') throw new Error(`截图失败：${result.reason}`);
+  return result;
+}
+
 export function apply(ctx) {
   /* ---- 全局热键守护（Ctrl+Alt+A 唤起截图，独立隐藏进程）---- */
   mkdirSync(HOTKEY_OUTPUT_DIR, { recursive: true });
@@ -64,6 +81,29 @@ export function apply(ctx) {
   watcher.once('exit', (code) => {
     if (code && code !== 2) console.error(`[dsh-screenshot] 全局热键守护进程退出（${code}）`);
   });
+
+  // Cordis 在悬浮助手可用时挂载贡献，服务卸载时释放该注册。
+  const floating = ctx.inject(['floatingAssistant'], (scope) => scope.floatingAssistant.register(
+    'dsh-screenshot',
+    [{
+      version: 1,
+      id: 'desktop',
+      title: '桌面截图',
+      provider: 'read',
+      actions: [{ id: 'capture', label: '开始截图', handler: 'capture', hideWindow: true }],
+    }],
+    {
+      read: () => ({
+        status: 'ready',
+        summary: '框选屏幕上的任意区域。确认后，截图和标注会保存为 PNG。',
+        availableActions: [{ id: 'capture' }],
+      }),
+      async capture({ signal }) {
+        const result = await captureRegion(DEFAULT_TIMEOUT_MS, signal);
+        return { status: 'ok', message: result.ok ? `已保存到 ${result.path}` : '已取消截图。' };
+      },
+    },
+  ));
 
   /* ---- Agent 工具：screenshot ---- */
   const dispose = ctx.tools.register({
@@ -87,25 +127,9 @@ export function apply(ctx) {
     async execute(args, exec) {
       const timeoutMs = Number.isFinite(args.timeout_ms) && args.timeout_ms > 1000
         ? args.timeout_ms : DEFAULT_TIMEOUT_MS;
-      exec.signal.throwIfAborted();
-
-      const dir = mkdtempSync(join(tmpdir(), 'dsh-screenshot-'));
-      const outPath = join(dir, 'screenshot.png');
-      const { stdout, stderr, error } = await runCapture(
-        ['-OutPath', outPath], timeoutMs, exec.signal);
-
-      const lines = stdout.split(/\r?\n/).filter(line => line.trim().startsWith('{'));
-      let result;
-      try {
-        result = JSON.parse(lines[lines.length - 1]);
-      } catch {
-        throw new Error(`截图进程未返回结果（exit=${error?.code ?? '?'}）。stderr: ${stderr.slice(0, 400)}`);
-      }
+      const result = await captureRegion(timeoutMs, exec.signal);
       if (!result.ok) {
-        if (result.reason === 'cancelled') {
-          return JSON.stringify({ ok: false, reason: 'cancelled', note: '用户取消了截图。' });
-        }
-        throw new Error(`截图失败：${result.reason}`);
+        return JSON.stringify({ ok: false, reason: 'cancelled', note: '用户取消了截图。' });
       }
       return JSON.stringify({
         ok: true,
@@ -122,6 +146,7 @@ export function apply(ctx) {
     }),
   });
   return () => {
+    floating.dispose();
     watcher.kill();
     dispose();
   };

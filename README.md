@@ -1,12 +1,13 @@
 # DSH Plugins
 
-DeepSeek Harness（DSH）插件集合。目前包含一个已实现的 Windows 截图插件，以及一个处于需求设计阶段的游戏助手。
+DeepSeek Harness（DSH）插件集合，包含 Windows 桌面截图、悬浮助手和规划中的游戏助手。
 
 ## 插件列表
 
 | 插件 | 当前状态 | 功能 |
 | --- | --- | --- |
 | [桌面截图](capture/)（`@local/dsh-screenshot`） | 已实现，包版本 `1.0.0` | Windows 多显示器框选截图、标注和 PNG 导出，支持 Agent 调用与全局快捷键。 |
+| [悬浮助手](floating-assistant/)（`@local/dsh-floating-assistant`） | 首个可运行版本 `0.1.0` | Windows 右侧浮窗、插件面板、默认面板和显示器设置，已接入桌面截图。 |
 | [GameGuide 游戏助手](gameguide/REQUIREMENTS.md) | 需求设计阶段，仓库内只有需求文档 | 计划支持游戏截图翻译、攻略问答、游玩进度记录和按当前局面计算行动方案。 |
 
 ## 桌面截图

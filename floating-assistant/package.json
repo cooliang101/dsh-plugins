@@ -1,0 +1,9 @@
+{
+  "name": "@local/dsh-floating-assistant",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./index.js" },
+  "files": ["index.js", "panels.js", "desktop.ps1", "panel.xaml", "cordis.patch.yml"],
+  "dsh": { "bundle": { "patch": "./cordis.patch.yml" } }
+}
