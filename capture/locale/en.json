@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Desktop screenshot",
+    "description": "Gives the agent a screenshot tool: a full-screen WeChat-style overlay lets the user frame a screen region, and the captured PNG path is returned to the agent. Also registers the global hotkey Ctrl+Alt+A to start a capture any time (auto-copied to the clipboard). Runs entirely inside DSH via PowerShell and .NET, no external service."
+  }
+}

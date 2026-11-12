@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "桌面截图",
+    "description": "给 Agent 提供截图工具：全屏微信式遮罩供用户框选屏幕区域，截取的 PNG 路径返回给 Agent；并注册系统级全局热键 Ctrl+Alt+A 随时唤起截图（自动复制进剪贴板）。完全在 DSH 内通过 PowerShell 与 .NET 运行，不依赖外部服务。"
+  }
+}

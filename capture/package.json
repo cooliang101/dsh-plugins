@@ -1,0 +1,16 @@
+{
+  "name": "@local/dsh-screenshot",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "WeChat-style Windows desktop screenshot for DSH: the agent triggers a screen capture, the user frames a region, and the PNG path returns to the agent",
+  "exports": {
+    ".": "./index.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": ["index.js", "capture.ps1", "annotations.cs", "hotkey-watch.ps1", "cordis.patch.yml", "locale/*.json", "icon.svg"],
+  "dsh": {
+    "bundle": { "patch": "./cordis.patch.yml" }
+  }
+}

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <rect x="4" y="4" width="56" height="56" rx="12" fill="#1c2230"/>
+  <!-- 取景框四角 -->
+  <path d="M18 14h-4v4M46 14h4v4M50 46v4h-4M14 46v4h4"
+        fill="none" stroke="#4c8dff" stroke-width="3" stroke-linecap="round"/>
+  <!-- 选区内的山形图案（截图） -->
+  <path d="M20 42l9-12 7 9 5-6 9 9z" fill="none" stroke="#e6edf3"
+        stroke-width="2.5" stroke-linejoin="round"/>
+  <circle cx="41" cy="24" r="4" fill="#3fb950"/>
+  <!-- 右下角截图光标 -->
+  <circle cx="49" cy="45" r="9" fill="none" stroke="#4c8dff" stroke-width="2.5"/>
+  <line x1="49" y1="32" x2="49" y2="41" stroke="#4c8dff" stroke-width="2" stroke-linecap="round"/>
+  <line x1="49" y1="49" x2="49" y2="58" stroke="#4c8dff" stroke-width="2" stroke-linecap="round"/>
+  <line x1="36" y1="45" x2="40" y2="45" stroke="#4c8dff" stroke-width="2" stroke-linecap="round"/>
+  <line x1="58" y1="45" x2="62" y2="45" stroke="#4c8dff" stroke-width="2" stroke-linecap="round"/>
+</svg>
